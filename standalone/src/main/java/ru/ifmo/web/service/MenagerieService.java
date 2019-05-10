@@ -75,13 +75,23 @@ public class MenagerieService {
         } catch (ParseException e) {
             date = null;
         }
-        return menagerieDAO.update(id, animal, name, breed, health, date) + "";
+        int updRes = menagerieDAO.update(id, animal, name, breed, health, date);
+        if (updRes == 0){
+            throw new NotFoundException(id);
+        } else {
+            return updRes + "";
+        }
     }
 
     @DELETE
     @Path("/delete")
     public String delete(@QueryParam("id") Long id) throws SQLException {
-        return menagerieDAO.delete(id) + "";
+        int delRes = menagerieDAO.delete(id);
+        if (delRes == 0){
+            throw new NotFoundException(id);
+        } else {
+            return delRes + "";
+        }
     }
 
     @POST

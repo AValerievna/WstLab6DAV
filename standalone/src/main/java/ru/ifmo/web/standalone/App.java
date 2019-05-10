@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.glassfish.grizzly.http.server.HttpServer;
 import ru.ifmo.web.service.InvalidParameterExceptionMapper;
 import ru.ifmo.web.service.MenagerieService;
+import ru.ifmo.web.service.NotFoundExceptionMapper;
 
 import java.io.IOException;
 
@@ -16,7 +17,7 @@ public class App {
 
         log.info("Creating configs");
         ClassNamesResourceConfig config = new ClassNamesResourceConfig(MenagerieService.class,
-                InvalidParameterExceptionMapper.class);
+                InvalidParameterExceptionMapper.class, NotFoundExceptionMapper.class);
         log.info("Creating server");
         HttpServer server = GrizzlyServerFactory.createHttpServer(url, config);
         log.info("Starting server");
