@@ -1,19 +1,16 @@
 package ru.ifmo.web.client;
 
-import lombok.extern.slf4j.Slf4j;
-import ru.ifmo.web.database.entity.Menagerie;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+import lombok.extern.slf4j.Slf4j;
+import ru.ifmo.web.database.entity.Menagerie;
 
+import javax.ws.rs.core.MediaType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
 
 @Slf4j
 public class MenagerieResourceIntegration {
@@ -25,20 +22,21 @@ public class MenagerieResourceIntegration {
     
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-    public List<Menagerie> findAll() {
+    public  RequestResult<List<Menagerie>> findAll() {
         Client client = Client.create();
         WebResource webResource = client.resource(findAllUrl);
         ClientResponse response =
                 webResource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-            throw new IllegalStateException("Request failed");
+            GenericType<String> type = new GenericType<String>() {};
+            return new RequestResult<>(true, response.getEntity(type), null);
         }
         GenericType<List<Menagerie>> type = new GenericType<List<Menagerie>>() {
         };
-        return response.getEntity(type);
+        return new RequestResult<>(false, null, response.getEntity(type));
     }
 
-    public List<Menagerie> findWithFilters(Long id, String animal, String name, String breed, String health, Date arrival) {
+    public  RequestResult<List<Menagerie>> findWithFilters(Long id, String animal, String name, String breed, String health, Date arrival) {
         Client client = Client.create();
         WebResource webResource = client.resource(filterUrl);
         if (id != null) {
@@ -61,14 +59,15 @@ public class MenagerieResourceIntegration {
         }
         ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-            throw new IllegalStateException("Request failed");
+            GenericType<String> type = new GenericType<String>() {};
+            return new RequestResult<>(true, response.getEntity(type), null);
         }
         GenericType<List<Menagerie>> type = new GenericType<List<Menagerie>>() {
         };
-        return response.getEntity(type);
+        return new RequestResult<>(false, null, response.getEntity(type));
     }
 
-    public Long create(String animal, String name, String breed, String health, Date arrival) {
+    public RequestResult<Long> create(String animal, String name, String breed, String health, Date arrival) {
         Client client = Client.create();
         WebResource webResource = client.resource(createUrl);
         if (animal != null) {
@@ -88,14 +87,16 @@ public class MenagerieResourceIntegration {
         }
         ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-            throw new IllegalStateException("Request failed");
+            GenericType<String> type = new GenericType<String>() {};
+            String entity = response.getEntity(type);
+            return new RequestResult<>(true, entity, null);
         }
         GenericType<String> type = new GenericType<String>() {
         };
-        return Long.parseLong(response.getEntity(type));
+        return new RequestResult<>(false, null, Long.parseLong(response.getEntity(type)));
     }
 
-    public int update(Long id, String animal, String name, String breed, String health, Date arrival) {
+    public  RequestResult<Integer> update(Long id, String animal, String name, String breed, String health, Date arrival) {
         Client client = Client.create();
         WebResource webResource = client.resource(updateUrl);
         if (id != null) {
@@ -118,14 +119,15 @@ public class MenagerieResourceIntegration {
         }
         ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).put(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-            throw new IllegalStateException("Request failed");
+            GenericType<String> type = new GenericType<String>() {};
+            return new RequestResult<>(true, response.getEntity(type), null);
         }
         GenericType<String> type = new GenericType<String>() {
         };
-        return Integer.parseInt(response.getEntity(type));
+        return new RequestResult<>(false, null, Integer.parseInt(response.getEntity(type)));
     }
 
-    public int delete(Long id) {
+    public  RequestResult<Integer> delete(Long id) {
         Client client = Client.create();
         WebResource webResource = client.resource(deleteUrl);
         if (id != null) {
@@ -133,10 +135,11 @@ public class MenagerieResourceIntegration {
         }
         ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).delete(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-            throw new IllegalStateException("Request failed");
+            GenericType<String> type = new GenericType<String>() {};
+            return new RequestResult<>(true, response.getEntity(type), null);
         }
         GenericType<String> type = new GenericType<String>() {
         };
-        return Integer.parseInt(response.getEntity(type));
+        return new RequestResult<>(false, null, Integer.parseInt(response.getEntity(type)));
     }
 }

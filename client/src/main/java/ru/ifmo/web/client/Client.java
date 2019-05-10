@@ -2,14 +2,12 @@ package ru.ifmo.web.client;
 
 import ru.ifmo.web.database.entity.Menagerie;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.List;
 
 public class Client {
     public static void main(String... args) throws IOException {
@@ -32,8 +30,12 @@ public class Client {
                     break;
                 case 1:
                     System.out.println("All animals:");
-                    menageriePort.findAll().stream().map(Client::menagerieToString).forEach(System.out::println);
-                    currentState = 0;
+                    RequestResult<List<Menagerie>> allResult = menageriePort.findAll();
+                    if (allResult.isErr()) {
+                        System.out.println(allResult.getErrorMessage());
+                    } else {
+                        allResult.getResult().stream().map(Client::menagerieToString).forEach(System.out::println);
+                    }                    currentState = 0;
                     break;
                 case 2:
                     System.out.println("\nFill in the value of filter, if you'd like to");
@@ -50,16 +52,20 @@ public class Client {
                     System.out.println("arrival(yyyy-mm-dd):");
                     Date arrival = readDate(reader);
                     System.out.println("Found:");
-                    menageriePort.findWithFilters(id, animal, name, breed, health, arrival).stream().map(Client::menagerieToString).forEach(System.out::println);
+                    RequestResult<List<Menagerie>> result = menageriePort.findWithFilters(id, animal, name, breed,
+                            health, arrival);
+                    if (result.isErr()) {
+                        System.out.println(result.getErrorMessage());
+                    } else {
+                        result.getResult().stream().map(Client::menagerieToString).forEach(System.out::println);
+                    }
                     currentState = 0;
                     break;
                 case 3:
                     System.out.println("\nFill in all fields");
                     String createAnimal;
-                    do {
-                        System.out.println("animal:");
-                        createAnimal = readString(reader);
-                    } while (createAnimal == null);
+                    System.out.println("animal:");
+                    createAnimal = readString(reader);
                     String createName;
                     do {
                         System.out.println("name:");
@@ -76,12 +82,15 @@ public class Client {
                         createHealth = readString(reader);
                     } while (createHealth == null);
                     Date createArrival;
-                    do {
-                        System.out.println("arrival(yyyy-mm-dd):");
-                        createArrival = readDate(reader);
-                    } while (createArrival == null);
-                    Long createdId = menageriePort.create(createAnimal, createName, createBreed, createHealth, createArrival);
-                    System.out.println("new ID: " + createdId);
+                    System.out.println("arrival(yyyy-mm-dd):");
+                    createArrival = readDate(reader);
+                    RequestResult<Long> longRequestResult = menageriePort.create(createAnimal, createName, createBreed,
+                            createHealth, createArrival);
+                    if (longRequestResult.isErr()) {
+                        System.out.println(longRequestResult.getErrorMessage());
+                    } else {
+                        System.out.println("ID новой записи: " + longRequestResult.getResult());
+                    }
                     currentState = 0;
                     break;
                 case 4:
@@ -105,8 +114,14 @@ public class Client {
                     String updateHealth = readString(reader);
                     System.out.println("arrival(yyyy-mm-dd):");
                     Date updateArrival = readDate(reader);
-                    int updateRes = menageriePort.update(updateId, updateAnimal, updateName, updateBreed, updateHealth, updateArrival);
-                    System.out.println("Value was changed, notes count:"+updateRes);
+                    RequestResult<Integer> update = menageriePort.update(updateId, updateAnimal, updateName,
+                            updateBreed, updateHealth, updateArrival);
+                    if (update.isErr()) {
+                        System.out.println(update.getErrorMessage());
+                    } else {
+                        System.out.println("Изменено " + update.getResult() + " строк");
+
+                    }
                     currentState = 0;
                     break;
                 case 5:
@@ -119,8 +134,12 @@ public class Client {
                         currentState = 0;
                         break;
                     }
-                    int deleteRes = menageriePort.delete(deleteId);
-                    System.out.println("Value was deleted, notes count:"+deleteRes);
+                    RequestResult<Integer> delete = menageriePort.delete(deleteId);
+                    if (delete.isErr()) {
+                        System.out.println(delete.getErrorMessage());
+                    } else {
+                        System.out.println("Удалено " + delete.getResult() + " строк");
+                    }
                     currentState = 0;
                     break;
                 case 6:

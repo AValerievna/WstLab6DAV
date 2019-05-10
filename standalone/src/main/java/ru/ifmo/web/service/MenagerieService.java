@@ -8,20 +8,13 @@ import ru.ifmo.web.database.dao.MenagerieDAO;
 import ru.ifmo.web.database.entity.Menagerie;
 import ru.ifmo.web.standalone.App;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -69,6 +62,12 @@ public class MenagerieService {
     public String update(@QueryParam("id") Long id, @QueryParam("animal") String animal,
                          @QueryParam("name") String name, @QueryParam("breed") String breed,
                          @QueryParam("health") String health, @QueryParam("arrival") String arrival) throws SQLException, ParseException {
+        if (animal == null) {
+            throw new InvalidParameterException("animal");
+        }
+        if (arrival == null) {
+            throw new InvalidParameterException("arrival");
+        }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date;
         try {
@@ -90,6 +89,12 @@ public class MenagerieService {
     public String create(@QueryParam("animal") String animal,
                          @QueryParam("name") String name, @QueryParam("breed") String breed,
                          @QueryParam("health") String health, @QueryParam("arrival") String arrival) throws SQLException, ParseException {
+        if (animal == null) {
+            throw new InvalidParameterException("animal");
+        }
+        if (arrival == null) {
+            throw new InvalidParameterException("arrival");
+        }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date;
         try {
