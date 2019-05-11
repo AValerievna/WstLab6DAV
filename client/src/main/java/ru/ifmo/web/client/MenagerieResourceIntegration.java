@@ -14,17 +14,14 @@ import java.util.List;
 
 @Slf4j
 public class MenagerieResourceIntegration {
-    private final String findAllUrl = "http://localhost:8080/menagerie/all";
+    private final String baseUrl = "http://localhost:8080/menagerie";
     private final String filterUrl = "http://localhost:8080/menagerie/filter";
-    private final String updateUrl = "http://localhost:8080/menagerie/update";
-    private final String deleteUrl = "http://localhost:8080/menagerie/delete";
-    private final String createUrl = "http://localhost:8080/menagerie/create";
     
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     public  RequestResult<List<Menagerie>> findAll() {
         Client client = Client.create();
-        WebResource webResource = client.resource(findAllUrl);
+        WebResource webResource = client.resource(baseUrl);
         ClientResponse response =
                 webResource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
@@ -69,7 +66,7 @@ public class MenagerieResourceIntegration {
 
     public RequestResult<Long> create(String animal, String name, String breed, String health, Date arrival) {
         Client client = Client.create();
-        WebResource webResource = client.resource(createUrl);
+        WebResource webResource = client.resource(baseUrl);
         if (animal != null) {
             webResource = webResource.queryParam("animal", animal);
         }
@@ -98,9 +95,9 @@ public class MenagerieResourceIntegration {
 
     public  RequestResult<Integer> update(Long id, String animal, String name, String breed, String health, Date arrival) {
         Client client = Client.create();
-        WebResource webResource = client.resource(updateUrl);
+        WebResource webResource = client.resource(baseUrl);
         if (id != null) {
-            webResource = webResource.queryParam("id", id + "");
+            webResource = webResource.path(id + "");
         }
         if (animal != null) {
             webResource = webResource.queryParam("animal", animal);
@@ -129,9 +126,9 @@ public class MenagerieResourceIntegration {
 
     public  RequestResult<Integer> delete(Long id) {
         Client client = Client.create();
-        WebResource webResource = client.resource(deleteUrl);
+        WebResource webResource = client.resource(baseUrl);
         if (id != null) {
-            webResource = webResource.queryParam("id", id + "");
+            webResource = webResource.path(id + "");
         }
         ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).delete(ClientResponse.class);
         if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {

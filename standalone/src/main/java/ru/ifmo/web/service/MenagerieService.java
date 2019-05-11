@@ -37,7 +37,6 @@ public class MenagerieService {
     }
 
     @GET
-    @Path("/all")
     public List<Menagerie> findAll() throws SQLException {
         return menagerieDAO.findAll();
     }
@@ -58,8 +57,8 @@ public class MenagerieService {
     }
 
     @PUT
-    @Path("/update")
-    public String update(@QueryParam("id") Long id, @QueryParam("animal") String animal,
+    @Path("{id}")
+    public String update(@PathParam("id") Long id, @QueryParam("animal") String animal,
                          @QueryParam("name") String name, @QueryParam("breed") String breed,
                          @QueryParam("health") String health, @QueryParam("arrival") String arrival) throws SQLException, ParseException {
         if (animal == null) {
@@ -84,8 +83,8 @@ public class MenagerieService {
     }
 
     @DELETE
-    @Path("/delete")
-    public String delete(@QueryParam("id") Long id) throws SQLException {
+    @Path("{id}")
+    public String delete(@PathParam("id") Long id) throws SQLException {
         int delRes = menagerieDAO.delete(id);
         if (delRes == 0){
             throw new NotFoundException(id);
@@ -95,10 +94,10 @@ public class MenagerieService {
     }
 
     @POST
-    @Path("/create")
     public String create(@QueryParam("animal") String animal,
                          @QueryParam("name") String name, @QueryParam("breed") String breed,
-                         @QueryParam("health") String health, @QueryParam("arrival") String arrival) throws SQLException, ParseException {
+                         @QueryParam("health") String health, @QueryParam("arrival") String arrival) throws
+            SQLException, ParseException {
         if (animal == null) {
             throw new InvalidParameterException("animal");
         }
